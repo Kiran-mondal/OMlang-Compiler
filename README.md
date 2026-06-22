@@ -1,4 +1,10 @@
-# 🕉️ OmLang-Compiler
+#                 🕉️ OmLang-Compiler
+  ![OMlang Version](https://img.shields.io/badge/version-v2.0.0--Master-blue.svg?style=flat-square)
+![Made with Python](https://img.shields.io/badge/Made%20with-Python-FFD43B.svg?style=flat-square&logo=python&logoColor=blue)
+![Supported OS](https://img.shields.io/badge/OS-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Termux-blueviolet.svg?style=flat-square)
+![Terminal Support](https://img.shields.io/badge/Terminal-CMD%20%7C%20PowerShell%20%7C%20Bash-lightgrey.svg?style=flat-square&logo=gnometerminal)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-success.svg?style=flat-square)
 
 **OMlang-Compiler** is a powerful, minimalist, and culturally-inspired programming language compiler engine. It converts simple English instructions into optimized runtime logic. This core compiler runs flawlessly as a Cross-Platform Command Line Interface (CLI) across Windows CMD, Linux Bash, macOS Terminal, and Android Termux.
 

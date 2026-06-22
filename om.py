@@ -3,7 +3,7 @@ import os
 import re
 import math
 
-OM_VERSION = "v2.7.1-Object-Oriented-Fixed"
+OM_VERSION = "v2.7.2-Tokenizer-Fixed"
 
 def smart_input(prompt=""):
     """Automatically converts user input into text or numerical types."""
@@ -44,8 +44,8 @@ class OmCompiler:
                 py_code.append("    " * indent + line)
                 continue
 
-            # FIXED TOKENIZER: Multi-character operators (==, !=, <=, >=) are checked first to prevent syntax splitting
-            tokens = re.findall(r'"[^"\\]*(?:\\.[^"\\]*)*"|\'[^\'\\]*(?:\\.[^\'\\]*)*\'|==|!=|<=|>=|[a-zA-Z_][a-zA-Z0-9_]*|\d+(?:\.\d+)?|\+|-|\*|/|=|<|>', line)
+            # FIXED TOKENIZER: Added comma (,) support at the very end of the regex pattern
+            tokens = re.findall(r'"[^"\\]*(?:\\.[^"\\]*)*"|\'[^\'\\]*(?:\\.[^\'\\]*)*\'|==|!=|<=|>=|[a-zA-Z_][a-zA-Z0-9_]*|\d+(?:\.\d+)?|\+|-|\*|/|=|<|>|,', line)
             if not tokens:
                 continue
 
@@ -207,4 +207,4 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-        
+    

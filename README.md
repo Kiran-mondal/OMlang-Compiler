@@ -6,7 +6,7 @@
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
 ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-success.svg?style=flat-square)
 
-**OMlang-Compiler** is a powerful, minimalist, and culturally-inspired programming language compiler engine. It converts simple English instructions into optimized runtime logic. This core compiler runs flawlessly as a Cross-Platform Command Line Interface (CLI) across Windows CMD, Linux Bash, macOS Terminal, and Android Termux.
+**OmLang-Compiler** is a powerful, minimalist, and culturally-inspired programming language compiler engine. It converts simple English instructions into optimized runtime logic. This core compiler runs flawlessly as a Cross-Platform Command Line Interface (CLI) across Windows CMD, Linux Bash, macOS Terminal, and Android Termux.
 
 ## 🚀 Core Features
 - **Identity Banner:** Displays a stylized initialization header on runtime boot.

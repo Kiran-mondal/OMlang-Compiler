@@ -17,7 +17,7 @@ Anyone downloading this repository from GitHub can install the compiler globally
 ### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/Kiran-mondal/OmLang-Compiler.git
-cd OMlang-Compiler
+cd OmLang-Compiler
 pip install -e .
 ```
 ```ruby

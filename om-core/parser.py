@@ -1,8 +1,11 @@
 # =====================================================================
-# MODULE: om-core/parser.py (GRAMMATICAL PARSING ENGINE)
+# MODULE: om-core/parser.py (WITH STRING SUPPORT)
 # =====================================================================
 import sys
-from lexer import TokenType
+try:
+    from .lexer import TokenType
+except (ImportError, ValueError):
+    from lexer import TokenType
 
 class AssignNode:
     def init(self, name, value): self.name = name; self.value = value
@@ -14,6 +17,8 @@ class NumNode:
     def init(self, val): self.val = val
 class VarNode:
     def init(self, name): self.name = name
+class StringNode:               # <-- NEW
+    def init(self, val): self.val = val
 
 class OmParser:
     def init(self, lexer):
@@ -24,7 +29,7 @@ class OmParser:
         if self.current_token.type == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            print(f"Syntax Error: Expected token type '{token_type}', found '{self.current_token.type}'")
+            print(f"Syntax Error: Expected '{token_type}', found '{self.current_token.type}'")
             sys.exit(1)
 
     def parse(self):
@@ -39,7 +44,7 @@ class OmParser:
                 self.consume(TokenType.ASSIGN)
                 statements.append(AssignNode(name, self.expr()))
             else:
-                print(f"Syntax Error: Invalid token start sequence '{self.current_token.value}'")
+                print(f"Syntax Error: Invalid start token '{self.current_token.value}'")
                 sys.exit(1)
         return statements
 
@@ -64,9 +69,12 @@ class OmParser:
         if t.type == TokenType.NUMBER:
             self.consume(TokenType.NUMBER)
             return NumNode(t.value)
+        elif t.type == TokenType.STRING: # <-- NEW
+            self.consume(TokenType.STRING)
+            return StringNode(t.value)
         elif t.type == TokenType.IDENTIFIER:
             name = t.value
             self.consume(TokenType.IDENTIFIER)
             return VarNode(name)
-        print(f"Parser Error: Unexpected token evaluation context {t}")
+        print(f"Parser Error: Unexpected token {t}")
         sys.exit(1)

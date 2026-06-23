@@ -3,7 +3,7 @@ import os
 import math
 import time
 
-# Safely import third-party visualization dependencies
+# Safely import third-party data science and visualization dependencies
 try:
     import numpy as np
 except ImportError:
@@ -28,7 +28,7 @@ except ImportError:
     go = None
     px = None
 
-OM_VERSION = "v3.5.0-Visualization-Libs"
+OM_VERSION = "v3.6.0-Bracket-Array-Support"
 
 # =====================================================================
 # 1. THE LEXER
@@ -60,6 +60,8 @@ class TokenType:
     DIV = "/"
     LPAREN = "("
     RPAREN = ")"
+    LBRACKET = "["
+    RBRACKET = "]"
     COMMA = ","
     EQ = "=="
     NEQ = "!="
@@ -171,7 +173,7 @@ class OmLexer:
             mapping = {
                 '+': TokenType.PLUS, '-': TokenType.MINUS, '*': TokenType.MUL,
                 '/': TokenType.DIV,  '(': TokenType.LPAREN, ')': TokenType.RPAREN,
-                ',': TokenType.COMMA
+                '[': TokenType.LBRACKET, ']': TokenType.RBRACKET, ',': TokenType.COMMA
             }
             if self.current_char in mapping:
                 t = Token(mapping[self.current_char], self.current_char, self.line_num)
@@ -340,6 +342,16 @@ class OmParser:
                 self.consume(TokenType.LPAREN)
                 self.consume(TokenType.RPAREN)
             return InputNode()
+        elif t.type == TokenType.LBRACKET:
+            # Safely group linear list elements into a unified block literal
+            val = "["
+            self.consume(TokenType.LBRACKET)
+            while self.current_token.type != TokenType.RBRACKET and self.current_token.type != TokenType.EOF:
+                val += str(self.current_token.value)
+                self.consume(self.current_token.type)
+            val += "]"
+            self.consume(TokenType.RBRACKET)
+            return VarNode(val)
         elif t.type == TokenType.IDENTIFIER:
             name = t.value
             self.consume(TokenType.IDENTIFIER)
@@ -359,7 +371,7 @@ class OmParser:
             node = self.expr()
             self.consume(TokenType.RPAREN)
             return node
-        self.error(f"Unexpected matrix or canvas token configuration '{t.value}'")
+        self.error(f"Unexpected grammar factor construction layout token '{t.value}'")
 
 # =====================================================================
 # 3. CODE GENERATOR
@@ -421,7 +433,7 @@ class OmGenerator:
             return "\n".join(lines)
 
 # =====================================================================
-# 4. RUNTIME ENVIRONMENT WITH GRAPHICAL BINDINGS
+# 4. RUNTIME SYSTEM
 # =====================================================================
 def smart_input(prompt=""):
     val = input(prompt)
@@ -432,7 +444,7 @@ def smart_input(prompt=""):
         return val
 
 def build_missing_dependency_hook(lib_name):
-    return lambda *args, **kwargs: print(f"Runtime Error: Visual rendering component '{lib_name}' is not installed.")
+    return lambda *args, **kwargs: print(f"Runtime Error: Engine component framework reference '{lib_name}' is not installed.")
 
 class OmCompiler:
     def __init__(self, filename):
@@ -466,11 +478,10 @@ class OmCompiler:
             'round': round, 'abs': abs,
         }
 
-        # Bring forward standard utilities for data conversions
+        # Safe dynamic runtime mapping evaluation structures
         if np: global_context['om_numpy_array'] = lambda d: np.array(d)
         if pd: global_context['om_pandas_dataframe'] = lambda d: pd.DataFrame(d)
 
-        # --- Seaborn Graphical System Binds (`om_seaborn`) ---
         if sns and plt:
             global_context.update({
                 'om_seaborn_lineplot': lambda x, y: sns.lineplot(x=x, y=y),
@@ -482,7 +493,6 @@ class OmCompiler:
         else:
             global_context['om_seaborn_lineplot'] = build_missing_dependency_hook('seaborn/matplotlib')
 
-        # --- Plotly Structural Rendering Binds (`om_plotly`) ---
         if px and go:
             global_context.update({
                 'om_plotly_line': lambda x, y, title: px.line(x=x, y=y, title=title).show(),
@@ -511,4 +521,4 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-    
+            

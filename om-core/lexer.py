@@ -1,5 +1,5 @@
 # =====================================================================
-# MODULE: om-core/lexer.py
+# MODULE: om-core/lexer.py (WITH STRING SUPPORT)
 # =====================================================================
 import sys
 
@@ -7,6 +7,7 @@ class TokenType:
     EOF = "EOF"
     IDENTIFIER = "IDENTIFIER"
     NUMBER = "NUMBER"
+    STRING = "STRING"  # <-- NEW
     SHOW = "show"
     ASSIGN = "="
     PLUS = "+"
@@ -36,12 +37,25 @@ class OmLexer:
             if self.current_char.isspace():
                 self.advance()
                 continue
+                
+            # --- NEW: Parse text inside quotes ---
+            if self.current_char in ('"', "'"):
+                quote_type = self.current_char
+                self.advance()
+                val = ""
+                while self.current_char is not None and self.current_char != quote_type:
+                    val += self.current_char
+                    self.advance()
+                self.advance() # Skip the closing quote
+                return Token(TokenType.STRING, val)
+
             if self.current_char.isdigit() or self.current_char == '.':
                 val = ""
                 while self.current_char is not None and (self.current_char.isdigit() or self.current_char == '.'):
                     val += self.current_char
                     self.advance()
                 return Token(TokenType.NUMBER, val)
+                
             if self.current_char.isalpha() or self.current_char == '_':
                 val = ""
                 while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
@@ -55,6 +69,8 @@ class OmLexer:
                 t = Token(mapping[self.current_char], self.current_char)
                 self.advance()
                 return t
+                
             print(f"Lexer Error: Unknown character '{self.current_char}'")
             sys.exit(1)
+            
         return Token(TokenType.EOF, None)

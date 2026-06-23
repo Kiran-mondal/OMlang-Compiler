@@ -1,5 +1,5 @@
 # =====================================================================
-# MODULE: om-core/lexer.py (WITH STRING SUPPORT)
+# MODULE: om-core/lexer.py
 # =====================================================================
 import sys
 
@@ -7,7 +7,7 @@ class TokenType:
     EOF = "EOF"
     IDENTIFIER = "IDENTIFIER"
     NUMBER = "NUMBER"
-    STRING = "STRING"  # <-- NEW
+    STRING = "STRING"
     SHOW = "show"
     ASSIGN = "="
     PLUS = "+"
@@ -16,14 +16,14 @@ class TokenType:
     DIV = "/"
 
 class Token:
-    def init(self, type_, value):
+    def __init__(self, type_, value):
         self.type = type_
         self.value = value
-    def repr(self):
+    def __repr__(self):
         return f"Token({self.type}, {repr(self.value)})"
 
 class OmLexer:
-    def init(self, text):
+    def __init__(self, text):
         self.text = text
         self.pos = 0
         self.current_char = text[0] if text else None
@@ -38,7 +38,6 @@ class OmLexer:
                 self.advance()
                 continue
                 
-            # --- NEW: Parse text inside quotes ---
             if self.current_char in ('"', "'"):
                 quote_type = self.current_char
                 self.advance()
@@ -46,7 +45,7 @@ class OmLexer:
                 while self.current_char is not None and self.current_char != quote_type:
                     val += self.current_char
                     self.advance()
-                self.advance() # Skip the closing quote
+                self.advance() 
                 return Token(TokenType.STRING, val)
 
             if self.current_char.isdigit() or self.current_char == '.':
@@ -74,3 +73,4 @@ class OmLexer:
             sys.exit(1)
             
         return Token(TokenType.EOF, None)
+                    

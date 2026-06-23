@@ -1,5 +1,5 @@
 # =====================================================================
-# MODULE: om-core/parser.py (WITH STRING SUPPORT)
+# MODULE: om-core/parser.py
 # =====================================================================
 import sys
 try:
@@ -8,20 +8,20 @@ except (ImportError, ValueError):
     from lexer import TokenType
 
 class AssignNode:
-    def init(self, name, value): self.name = name; self.value = value
+    def __init__(self, name, value): self.name = name; self.value = value
 class ShowNode:
-    def init(self, expr): self.expr = expr
+    def __init__(self, expr): self.expr = expr
 class BinOpNode:
-    def init(self, left, op, right): self.left = left; self.op = op; self.right = right
+    def __init__(self, left, op, right): self.left = left; self.op = op; self.right = right
 class NumNode:
-    def init(self, val): self.val = val
+    def __init__(self, val): self.val = val
 class VarNode:
-    def init(self, name): self.name = name
-class StringNode:               # <-- NEW
-    def init(self, val): self.val = val
+    def __init__(self, name): self.name = name
+class StringNode:
+    def __init__(self, val): self.val = val
 
 class OmParser:
-    def init(self, lexer):
+    def __init__(self, lexer):
         self.lexer = lexer
         self.current_token = self.lexer.get_next_token()
 
@@ -69,7 +69,7 @@ class OmParser:
         if t.type == TokenType.NUMBER:
             self.consume(TokenType.NUMBER)
             return NumNode(t.value)
-        elif t.type == TokenType.STRING: # <-- NEW
+        elif t.type == TokenType.STRING:
             self.consume(TokenType.STRING)
             return StringNode(t.value)
         elif t.type == TokenType.IDENTIFIER:
@@ -78,3 +78,4 @@ class OmParser:
             return VarNode(name)
         print(f"Parser Error: Unexpected token {t}")
         sys.exit(1)
+        

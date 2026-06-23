@@ -3,7 +3,7 @@ import os
 import math
 import time
 
-# Safely catch missing third-party dependencies during core compiler initialization
+# Safely import third-party visualization dependencies
 try:
     import numpy as np
 except ImportError:
@@ -15,19 +15,23 @@ except ImportError:
     pd = None
 
 try:
-    import polars as pl
+    import seaborn as sns
+    import matplotlib.pyplot as plt
 except ImportError:
-    pl = None
+    sns = None
+    plt = None
 
 try:
-    import torch
+    import plotly.graph_objects as go
+    import plotly.express as px
 except ImportError:
-    torch = None
+    go = None
+    px = None
 
-OM_VERSION = "v3.4.0-DataScience-Libs"
+OM_VERSION = "v3.5.0-Visualization-Libs"
 
 # =====================================================================
-# 1. THE LEXER (Strictly English Keywords & Standard Identifiers)
+# 1. THE LEXER
 # =====================================================================
 class TokenType:
     EOF = "EOF"
@@ -180,7 +184,7 @@ class OmLexer:
         return Token(TokenType.EOF, None, self.line_num)
 
 # =====================================================================
-# 2. THE PARSER (Assembles nodes & tracks Data Science Expressions)
+# 2. THE PARSER
 # =====================================================================
 class ASTNode: pass
 class ProgramNode(ASTNode):
@@ -355,7 +359,7 @@ class OmParser:
             node = self.expr()
             self.consume(TokenType.RPAREN)
             return node
-        self.error(f"Unexpected math or data element token '{t.value}'")
+        self.error(f"Unexpected matrix or canvas token configuration '{t.value}'")
 
 # =====================================================================
 # 3. CODE GENERATOR
@@ -417,7 +421,7 @@ class OmGenerator:
             return "\n".join(lines)
 
 # =====================================================================
-# 4. RUNTIME SYSTEM & THIRD-PARTY LIBRARY ENGINES
+# 4. RUNTIME ENVIRONMENT WITH GRAPHICAL BINDINGS
 # =====================================================================
 def smart_input(prompt=""):
     val = input(prompt)
@@ -427,9 +431,8 @@ def smart_input(prompt=""):
     except ValueError:
         return val
 
-# Standardized error-handling fallbacks for missing environment modules
 def build_missing_dependency_hook(lib_name):
-    return lambda *args, **kwargs: print(f"Runtime Error: Library environment reference package '{lib_name}' is not installed.")
+    return lambda *args, **kwargs: print(f"Runtime Error: Visual rendering component '{lib_name}' is not installed.")
 
 class OmCompiler:
     def __init__(self, filename):
@@ -456,7 +459,6 @@ class OmCompiler:
         generator = OmGenerator()
         py_source = generator.generate(ast)
         
-        # Build evaluation contexts dynamically based on active system package components
         global_context = {
             'print': print,
             'smart_input': smart_input,
@@ -464,43 +466,31 @@ class OmCompiler:
             'round': round, 'abs': abs,
         }
 
-        # --- NumPy Integration Hub (`om_numpy`) ---
-        if np:
-            global_context.update({
-                'om_numpy_array': lambda data: np.array(data),
-                'om_numpy_zeros': lambda shape: np.zeros(shape),
-                'om_numpy_mean': lambda arr: np.mean(arr)
-            })
-        else:
-            global_context['om_numpy_array'] = build_missing_dependency_hook('numpy')
+        # Bring forward standard utilities for data conversions
+        if np: global_context['om_numpy_array'] = lambda d: np.array(d)
+        if pd: global_context['om_pandas_dataframe'] = lambda d: pd.DataFrame(d)
 
-        # --- Pandas Integration Hub (`om_pandas`) ---
-        if pd:
+        # --- Seaborn Graphical System Binds (`om_seaborn`) ---
+        if sns and plt:
             global_context.update({
-                'om_pandas_dataframe': lambda dict_data: pd.DataFrame(dict_data),
-                'om_pandas_read_csv': lambda path: pd.read_csv(path)
+                'om_seaborn_lineplot': lambda x, y: sns.lineplot(x=x, y=y),
+                'om_seaborn_scatterplot': lambda x, y: sns.scatterplot(x=x, y=y),
+                'om_seaborn_barplot': lambda x, y: sns.barplot(x=x, y=y),
+                'om_seaborn_show': lambda: plt.show(),
+                'om_seaborn_style': lambda style: sns.set_theme(style=style)
             })
         else:
-            global_context['om_pandas_dataframe'] = build_missing_dependency_hook('pandas')
+            global_context['om_seaborn_lineplot'] = build_missing_dependency_hook('seaborn/matplotlib')
 
-        # --- Polars Integration Hub (`om_polars`) ---
-        if pl:
+        # --- Plotly Structural Rendering Binds (`om_plotly`) ---
+        if px and go:
             global_context.update({
-                'om_polars_dataframe': lambda dict_data: pl.DataFrame(dict_data),
-                'om_polars_read_csv': lambda path: pl.read_csv(path)
+                'om_plotly_line': lambda x, y, title: px.line(x=x, y=y, title=title).show(),
+                'om_plotly_scatter': lambda x, y, title: px.scatter(x=x, y=y, title=title).show(),
+                'om_plotly_bar': lambda x, y, title: px.bar(x=x, y=y, title=title).show()
             })
         else:
-            global_context['om_polars_dataframe'] = build_missing_dependency_hook('polars')
-
-        # --- PyTorch Integration Hub (`om_torch`) ---
-        if torch:
-            global_context.update({
-                'om_torch_tensor': lambda data: torch.tensor(data),
-                'om_torch_rand': lambda *shape: torch.rand(*shape),
-                'om_torch_cuda_available': lambda: torch.cuda.is_available()
-            })
-        else:
-            global_context['om_torch_tensor'] = build_missing_dependency_hook('torch')
+            global_context['om_plotly_line'] = build_missing_dependency_hook('plotly')
         
         start_time = time.perf_counter()
         try:
@@ -521,3 +511,4 @@ def cli():
 
 if __name__ == "__main__":
     cli()
+    

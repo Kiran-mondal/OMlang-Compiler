@@ -4,28 +4,24 @@
 import sys
 
 class TokenType:
-    EOF = "EOF"
-    IDENTIFIER = "IDENTIFIER"
-    NUMBER = "NUMBER"
-    STRING = "STRING"
-    SHOW = "show"
-    ASSIGN = "="
-    PLUS = "+"
-    MINUS = "-"
-    MUL = "*"
-    DIV = "/"
+    EOF = "EOF"; IDENTIFIER = "IDENTIFIER"; NUMBER = "NUMBER"; STRING = "STRING"
+    SHOW = "show"; INPUT = "input"; ASSIGN = "="
+    PLUS = "+"; MINUS = "-"; MUL = "*"; DIV = "/"
+    
+    # NEW TOKENS
+    IF = "if"; WHILE = "while"
+    LBRACE = "{"; RBRACE = "}"
+    EQ = "=="; LT = "<"; GT = ">"
 
 class Token:
-    def __init__(self, type_, value):
-        self.type = type_
-        self.value = value
-    def __repr__(self):
+    def init(self, type_, value):
+        self.type = type_; self.value = value
+    def repr(self):
         return f"Token({self.type}, {repr(self.value)})"
 
 class OmLexer:
-    def __init__(self, text):
-        self.text = text
-        self.pos = 0
+    def init(self, text):
+        self.text = text; self.pos = 0
         self.current_char = text[0] if text else None
 
     def advance(self):
@@ -35,8 +31,7 @@ class OmLexer:
     def get_next_token(self):
         while self.current_char is not None:
             if self.current_char.isspace():
-                self.advance()
-                continue
+                self.advance(); continue
                 
             if self.current_char in ('"', "'"):
                 quote_type = self.current_char
@@ -60,10 +55,23 @@ class OmLexer:
                 while self.current_char is not None and (self.current_char.isalnum() or self.current_char == '_'):
                     val += self.current_char
                     self.advance()
-                if val == "show": return Token(TokenType.SHOW, val)
+                if val in ("show", "echo"): return Token(TokenType.SHOW, val)
+                if val == "input": return Token(TokenType.INPUT, val)
+                if val == "if": return Token(TokenType.IF, val)
+                if val == "while": return Token(TokenType.WHILE, val)
                 return Token(TokenType.IDENTIFIER, val)
             
-            mapping = {'=': TokenType.ASSIGN, '+': TokenType.PLUS, '-': TokenType.MINUS, '*': TokenType.MUL, '/': TokenType.DIV}
+            # Multi-character operator for ==
+            if self.current_char == '=':
+                self.advance()
+                if self.current_char == '=':
+                    self.advance()
+                    return Token(TokenType.EQ, "==")
+                return Token(TokenType.ASSIGN, "=")
+
+            mapping = {'+': TokenType.PLUS, '-': TokenType.MINUS, '*': TokenType.MUL, '/': TokenType.DIV, 
+                       '<': TokenType.LT, '>': TokenType.GT, '{': TokenType.LBRACE, '}': TokenType.RBRACE}
+            
             if self.current_char in mapping:
                 t = Token(mapping[self.current_char], self.current_char)
                 self.advance()
@@ -73,4 +81,3 @@ class OmLexer:
             sys.exit(1)
             
         return Token(TokenType.EOF, None)
-                    

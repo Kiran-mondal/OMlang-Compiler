@@ -1,5 +1,5 @@
 # =====================================================================
-# MODULE: om-core/compiler.py (WITH STRING SUPPORT)
+# MODULE: om-core/compiler.py
 # =====================================================================
 try:
     from .opcodes import OpCode
@@ -11,7 +11,7 @@ except (ImportError, ValueError):
     from parser import NumNode, VarNode, AssignNode, ShowNode, BinOpNode, StringNode
 
 class OmBytecodeCompiler:
-    def init(self):
+    def __init__(self):
         self.bytecode = []
         self.constants = []
 
@@ -32,7 +32,7 @@ class OmBytecodeCompiler:
             const_idx = self.add_constant(val)
             self.bytecode.extend([OpCode.LOAD_CONST, const_idx])
             
-        elif isinstance(node, StringNode): # <-- NEW
+        elif isinstance(node, StringNode):
             const_idx = self.add_constant(node.val)
             self.bytecode.extend([OpCode.LOAD_CONST, const_idx])
             
@@ -54,3 +54,4 @@ class OmBytecodeCompiler:
             elif node.op == TokenType.MINUS: self.bytecode.append(OpCode.SUB)
             elif node.op == TokenType.MUL: self.bytecode.append(OpCode.MUL)
             elif node.op == TokenType.DIV: self.bytecode.append(OpCode.DIV)
+                
